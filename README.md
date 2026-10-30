@@ -1,12 +1,15 @@
 # TubeIntent 🎯 — The Mindful YouTube Blocker
 
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-00f5d4?style=flat-square&logo=googlechrome&logoColor=black)](https://developer.chrome.com/docs/extensions/mv3/intro/)
+[![Website](https://img.shields.io/badge/Website-tubeintent.netlify.app-00f5d4?style=flat-square&logo=netlify&logoColor=black)](https://tubeintent.netlify.app)
 [![Microsoft Edge](https://img.shields.io/badge/Edge_Add--ons-v1.0.0-0078d7?style=flat-square&logo=microsoftedge&logoColor=white)](https://microsoftedge.microsoft.com/addons)
 [![License: MIT](https://img.shields.io/badge/License-MIT-38bdf8?style=flat-square)](LICENSE)
 [![Zero Telemetry](https://img.shields.io/badge/Privacy-Zero_Tracking-00f5d4?style=flat-square)](PRIVACY.md)
 
 > **Reclaim your focus from the YouTube algorithm.**  
 > TubeIntent replaces the addictive infinite homepage feed with a zen search bar, completely eradicates Shorts, and eliminates distracting recommendations and comments.
+>
+> 🌐 **Live Website:** [https://tubeintent.netlify.app](https://tubeintent.netlify.app)
 
 ---
 
