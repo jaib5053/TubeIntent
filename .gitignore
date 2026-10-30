@@ -1,0 +1,20 @@
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE & Gemini
+.gemini/
+.idea/
+.vscode/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Production artifacts
+*.zip

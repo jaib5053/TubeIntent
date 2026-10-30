@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TubeIntent</title>
+  <style>
+    /* =========================================================================
+       FUTURISTIC MINIMALIST DESIGN SYSTEM
+       Aesthetic: OLED Deep Slate, Frosted Glass, Electric Cyan & Amber Accents
+       ========================================================================= */
+
+    :root {
+      --bg: #090a0f;
+      --card-bg: rgba(255, 255, 255, 0.035);
+      --card-border: rgba(255, 255, 255, 0.07);
+      --card-hover: rgba(255, 255, 255, 0.055);
+      --accent: #00f5d4;
+      --accent-glow: rgba(0, 245, 212, 0.35);
+      --text-main: #f3f4f6;
+      --text-dim: #9ca3af;
+      --text-muted: #6b7280;
+      --paused-accent: #f59e0b;
+      --paused-glow: rgba(245, 158, 11, 0.35);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      padding: 18px 18px 16px 18px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 220px;
+      height: 120px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      opacity: 0.25;
+      filter: blur(28px);
+      pointer-events: none;
+      transition: background 0.4s ease, opacity 0.4s ease;
+    }
+
+    body.is-paused::before {
+      background: radial-gradient(circle, var(--paused-glow) 0%, transparent 70%);
+      opacity: 0.2;
+    }
+
+    /* --- Header --- */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: block;
+      filter: drop-shadow(0 0 8px var(--accent-glow));
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      background: linear-gradient(180deg, #ffffff 40%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 9px;
+      border-radius: 20px;
+      background: rgba(0, 245, 212, 0.08);
+      border: 1px solid rgba(0, 245, 212, 0.25);
+      color: var(--accent);
+      transition: all 0.3s ease;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    body.is-paused .status-pill {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(245, 158, 11, 0.25);
+      color: var(--paused-accent);
+    }
+
+    body.is-paused .status-dot {
+      background: var(--paused-accent);
+      box-shadow: 0 0 8px var(--paused-accent);
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.25); opacity: 0.6; }
+    }
+
+    /* --- Controls Container --- */
+    .controls-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Master Pause Card */
+    .control-card.master-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      margin-bottom: 4px;
+    }
+
+    body.is-paused .control-card.master-card {
+      border-color: rgba(245, 158, 11, 0.3);
+      background: rgba(245, 158, 11, 0.04);
+    }
+
+    .control-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .control-card:hover {
+      background: var(--card-hover);
+      border-color: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      max-width: 200px;
+    }
+
+    .card-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-label .icon {
+      font-size: 13px;
+    }
+
+    .card-desc {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      line-height: 1.35;
+      font-weight: 400;
+    }
+
+    /* --- Futuristic Toggle Switch --- */
+    .toggle {
+      position: relative;
+      width: 42px;
+      height: 23px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .toggle-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .toggle-track::before {
+      content: "";
+      position: absolute;
+      height: 17px;
+      width: 17px;
+      left: 2px;
+      bottom: 2px;
+      background: #e2e8f0;
+      border-radius: 50%;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Active State (Cyan Glow) */
+    .toggle input:checked + .toggle-track {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .toggle input:checked + .toggle-track::before {
+      transform: translateX(19px);
+      background: #090a0f;
+    }
+
+    /* Master Pause Toggle (Amber Glow when paused) */
+    .master-card .toggle input:checked + .toggle-track {
+      background: var(--paused-accent);
+      border-color: var(--paused-accent);
+      box-shadow: 0 0 12px var(--paused-glow);
+    }
+
+    .master-card .toggle input:checked + .toggle-track::before {
+      background: #090a0f;
+    }
+
+    .toggle input:focus-visible + .toggle-track {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Dim child options when paused */
+    body.is-paused .feature-card {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* --- Footer Status --- */
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .footer-saved {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-dim);
+      transition: color 0.3s ease;
+    }
+
+    .footer-version {
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Futuristic Minimal Header -->
+  <header class="header">
+    <div class="brand">
+      <img src="icons/icon48.png" class="brand-icon" alt="TubeIntent Logo" />
+      <span class="brand-title">TubeIntent</span>
+    </div>
+    <div class="status-pill" id="status-pill">
+      <span class="status-dot"></span>
+      <span id="status-text">ACTIVE</span>
+    </div>
+  </header>
+
+  <!-- Clean Streamlined Options -->
+  <main class="controls-stack">
+
+    <!-- 1. Master Pause Switch -->
+    <div class="control-card master-card">
+      <div class="card-info">
+        <span class="card-label">
+          <span class="icon">⏸️</span> Pause Extension
+        </span>
+        <span class="card-desc" id="pause-desc">Temporarily restore normal YouTube</span>
+      </div>
+      <label class="toggle" aria-label="Pause Extension">
+        <input type="checkbox" id="toggle-pause" />
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
+    <!-- 2. Zen Mode -->
+    <div class="control-card feature-card">
+      <div class="card-info">
+        <span class="card-label">
+          <span class="icon">🧘</span> Zen Mode
+        </span>
+        <span class="card-desc">Clean search bar instead of home feed</span>
+      </div>
+      <label class="toggle" aria-label="Zen Mode">
+        <input type="checkbox" id="toggle-zen" />
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
+    <!-- 3. Block Shorts -->
+    <div class="control-card feature-card">
+      <div class="card-info">
+        <span class="card-label">
+          <span class="icon">⚡</span> Block Shorts
+        </span>
+        <span class="card-desc">Purge Shorts shelves, tabs &amp; redirects</span>
+      </div>
+      <label class="toggle" aria-label="Block Shorts">
+        <input type="checkbox" id="toggle-shorts" />
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
+    <!-- 4. Hide Recommendations -->
+    <div class="control-card feature-card">
+      <div class="card-info">
+        <span class="card-label">
+          <span class="icon">🚫</span> Hide Recommendations
+        </span>
+        <span class="card-desc">Purge sidebar related videos on watch pages</span>
+      </div>
+      <label class="toggle" aria-label="Hide Recommendations">
+        <input type="checkbox" id="toggle-recommendations" />
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
+    <!-- 5. Hide Comments -->
+    <div class="control-card feature-card">
+      <div class="card-info">
+        <span class="card-label">
+          <span class="icon">💬</span> Hide Comments
+        </span>
+        <span class="card-desc">Remove comment sections under videos</span>
+      </div>
+      <label class="toggle" aria-label="Hide Comments">
+        <input type="checkbox" id="toggle-comments" />
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
+  </main>
+
+  <!-- Clean Minimal Footer -->
+  <footer class="footer">
+    <span class="footer-saved" id="save-status">
+      <span>●</span> Live auto-sync
+    </span>
+    <span class="footer-version">v1.0.0</span>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

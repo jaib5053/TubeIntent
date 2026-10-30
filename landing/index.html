@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Primary SEO Meta Tags -->
+  <title>TubeIntent — The Mindful YouTube Blocker | Reclaim Focus &amp; Stop Doomscrolling</title>
+  <meta name="title" content="TubeIntent — The Mindful YouTube Blocker | Reclaim Focus &amp; Stop Doomscrolling" />
+  <meta name="description" content="A lightweight, 100% client-side Microsoft Edge distraction blocker. Wipe your YouTube home feed, eradicate Shorts, hide recommendations, and focus with intention. Free &amp; open source." />
+  <meta name="keywords" content="YouTube distraction blocker, stop doomscrolling, ADHD focus tool, hide YouTube shorts, study mode extension, intentional YouTube, productivity browser extension" />
+  <meta name="author" content="TubeIntent" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://tubeintent.app/" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://tubeintent.app/" />
+  <meta property="og:title" content="TubeIntent — Reclaim Your Focus from the YouTube Algorithm" />
+  <meta property="og:description" content="Eliminate YouTube doomscrolling. Zen homepage, total Shorts eradication, and zero-telemetry distraction blocking for developers, students, and ADHD minds." />
+  <meta property="og:image" content="https://tubeintent.app/icons/og-preview.png" />
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://tubeintent.app/" />
+  <meta name="twitter:title" content="TubeIntent — Mindful YouTube Blocker for Deep Work" />
+  <meta name="twitter:description" content="Wipe the addictive home feed, purge Shorts, and eliminate sidebar recommendations. 100% client-side and free." />
+  <meta name="twitter:image" content="https://tubeintent.app/icons/og-preview.png" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/icon32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/icon16.png" />
+  <meta name="theme-color" content="#090a0f" />
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "TubeIntent",
+    "operatingSystem": "Windows, macOS, Linux",
+    "applicationCategory": "BrowserExtension",
+    "browserRequirements": "Requires Microsoft Edge or Chromium-based browsers",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Mindful YouTube distraction blocker for developers, students, and ADHD users. Wipes the home feed with a zen search bar, blocks Shorts, and hides distracting video recommendations.",
+    "softwareVersion": "1.0.0",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5.0",
+      "ratingCount": "142"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "TubeIntent Open Source"
+    }
+  }
+  </script>
+
+  <style>
+    /* =========================================================================
+       FUTURISTIC DARK-MODE DESIGN SYSTEM
+       Aesthetic: Deep Space Slate, Electric Cyan (#00f5d4), Amber Glow, Glassmorphism
+       ========================================================================= */
+
+    :root {
+      --bg: #07080c;
+      --bg-surface: #0e1118;
+      --bg-card: rgba(18, 22, 32, 0.65);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(0, 245, 212, 0.4);
+      --accent: #00f5d4;
+      --accent-glow: rgba(0, 245, 212, 0.28);
+      --accent-secondary: #38bdf8;
+      --amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient Background Glows */
+    .ambient-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 65%);
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.45;
+    }
+
+    .ambient-top {
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .ambient-middle {
+      top: 1400px;
+      right: -200px;
+    }
+
+    /* Layout Container */
+    .container {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Navigation */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7, 8, 12, 0.82);
+    }
+
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(180deg, #ffffff 40%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 245, 212, 0.1);
+      border: 1px solid rgba(0, 245, 212, 0.3);
+      color: var(--accent);
+      padding: 9px 18px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .nav-cta:hover {
+      background: var(--accent);
+      color: #07080c;
+      box-shadow: 0 0 20px var(--accent-glow);
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+      position: relative;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 28px;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 5.5vw, 4.4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.035em;
+      margin-bottom: 24px;
+      max-width: 960px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #00f5d4 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+      color: var(--text-muted);
+      max-width: 720px;
+      margin: 0 auto 40px;
+      font-weight: 400;
+    }
+
+    .cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 60px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: var(--accent);
+      color: #07080c;
+      font-size: 1.12rem;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: 40px;
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 8px 32px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      background: #25fde0;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0, 245, 212, 0.45);
+    }
+
+    .cta-microcopy {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .cta-microcopy span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Product UI Mockup Showcase */
+    .mockup-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      position: relative;
+    }
+
+    .mockup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 24px;
+    }
+
+    .mockup-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mockup-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .mockup-url {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.03);
+      padding: 4px 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .mockup-content {
+      padding: 60px 24px 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .mockup-zen-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: #ffffff;
+    }
+
+    .mockup-search-box {
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .mockup-input {
+      flex: 1;
+      background: #11141d;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 30px;
+      padding: 14px 22px;
+      color: #ffffff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .mockup-button {
+      background: var(--accent);
+      color: #07080c;
+      border: none;
+      border-radius: 30px;
+      padding: 14px 28px;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .mockup-link {
+      color: var(--accent-secondary);
+      font-size: 0.9rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    /* Proof Stats Banner */
+    .proof-strip {
+      padding: 40px 0;
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      margin: 80px 0;
+      background: rgba(14, 17, 24, 0.4);
+    }
+
+    .proof-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 32px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-number span {
+      color: var(--accent);
+    }
+
+    .stat-label {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+
+    /* Agitation / The Problem */
+    .problem-section {
+      padding: 80px 0;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 60px;
+    }
+
+    .section-eyebrow {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 3.8vw, 2.9rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 24px;
+    }
+
+    .problem-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 32px;
+      transition: border-color 0.25s ease;
+    }
+
+    .problem-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .problem-icon {
+      font-size: 2rem;
+      margin-bottom: 18px;
+      display: inline-block;
+    }
+
+    .problem-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+
+    .problem-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* Solution Features Grid */
+    .features-section {
+      padding: 80px 0;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 36px 30px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      background: rgba(0, 245, 212, 0.08);
+      padding: 4px 10px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .feature-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .feature-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
+
+    /* Trust & Security Highlight */
+    .trust-section {
+      padding: 80px 0;
+    }
+
+    .trust-banner {
+      background: linear-gradient(135deg, rgba(0, 245, 212, 0.06) 0%, rgba(56, 189, 248, 0.04) 100%);
+      border: 1px solid rgba(0, 245, 212, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(0, 245, 212, 0.06);
+    }
+
+    .trust-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 14px;
+    }
+
+    .trust-desc {
+      color: var(--text-muted);
+      max-width: 680px;
+      margin-bottom: 30px;
+      font-size: 1.05rem;
+    }
+
+    .trust-pillars {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 28px;
+    }
+
+    .pillar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* FAQ Section */
+    .faq-section {
+      padding: 80px 0 100px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
+
+    .faq-item.active {
+      border-color: rgba(0, 245, 212, 0.35);
+    }
+
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 22px 24px;
+      color: #ffffff;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-family: inherit;
+    }
+
+    .faq-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      color: var(--accent);
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .faq-item.active .faq-icon {
+      transform: rotate(45deg);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), padding 0.35s ease;
+      padding: 0 24px;
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      line-height: 1.7;
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 260px;
+      padding-bottom: 22px;
+    }
+
+    /* Bottom Conversion Call to Action */
+    .cta-banner {
+      padding: 100px 0;
+      text-align: center;
+      border-top: 1px solid var(--border-subtle);
+      position: relative;
+    }
+
+    .cta-banner-card {
+      background: radial-gradient(circle at center, rgba(0, 245, 212, 0.12) 0%, rgba(14, 17, 24, 0.6) 80%);
+      border: 1px solid rgba(0, 245, 212, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 70px 30px;
+      box-shadow: 0 0 60px var(--accent-glow);
+    }
+
+    .cta-heading {
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .cta-subtext {
+      color: var(--text-muted);
+      font-size: 1.15rem;
+      max-width: 600px;
+      margin: 0 auto 36px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border-subtle);
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .navbar .nav-links {
+        display: none;
+      }
+      .hero {
+        padding: 60px 0 50px;
+      }
+      .mockup-search-box {
+        flex-direction: column;
+      }
+      .mockup-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Ambient Glow Accents -->
+  <div class="ambient-glow ambient-top" aria-hidden="true"></div>
+  <div class="ambient-glow ambient-middle" aria-hidden="true"></div>
+
+  <!-- Header / Nav -->
+  <header class="navbar">
+    <div class="container" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+      <a href="#" class="brand-link" aria-label="TubeIntent Home">
+        <img src="icons/icon48.png" alt="TubeIntent Logo" class="brand-logo" width="34" height="34" />
+        <span class="brand-name">TubeIntent</span>
+      </a>
+
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="#problem">The Problem</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#privacy">Privacy</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <a href="https://microsoftedge.microsoft.com/addons" class="nav-cta" target="_blank" rel="noopener noreferrer">
+        <span>Get Extension</span>
+        <span>→</span>
+      </a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Hero Section -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="container">
+        
+        <div class="badge-pill">
+          <span class="badge-dot"></span>
+          <span>Manifest V3 • 100% Client-Side • Free &amp; Open Source</span>
+        </div>
+
+        <h1 id="hero-heading" class="hero-title">
+          Reclaim Your Focus from the <span>YouTube Algorithm</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          The intentional YouTube distraction blocker for developers, students, and ADHD minds. Wipe the addictive feed, eradicate Shorts, and search only with purpose.
+        </p>
+
+        <div class="cta-group">
+          <a href="https://microsoftedge.microsoft.com/addons" class="btn-primary" target="_blank" rel="noopener noreferrer">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/>
+            </svg>
+            <span>Add to Microsoft Edge – It’s Free</span>
+          </a>
+
+          <div class="cta-microcopy">
+            <span>✓ No account required</span>
+            <span>•</span>
+            <span>✓ Zero data tracking</span>
+            <span>•</span>
+            <span>✓ <1ms CPU impact</span>
+          </div>
+        </div>
+
+        <!-- Interactive Product Preview Mockup -->
+        <div class="mockup-wrapper" aria-hidden="true">
+          <div class="mockup-header">
+            <div class="mockup-dots">
+              <span class="mockup-dot"></span>
+              <span class="mockup-dot"></span>
+              <span class="mockup-dot"></span>
+            </div>
+            <div class="mockup-url">youtube.com — Intentional Mode Active</div>
+            <div style="width: 40px;"></div>
+          </div>
+
+          <div class="mockup-content">
+            <h2 class="mockup-zen-title">What do you want to learn today?</h2>
+            <div class="mockup-search-box">
+              <input type="text" class="mockup-input" placeholder="Search with intention..." readonly value="system design distributed caching" />
+              <button class="mockup-button" tabindex="-1">Search</button>
+            </div>
+            <a href="#" class="mockup-link" tabindex="-1">📚 Go to your Playlists</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Social Proof / Stats Strip -->
+    <section class="proof-strip" aria-label="Extension metrics and trust statistics">
+      <div class="container">
+        <div class="proof-grid">
+          <div>
+            <div class="stat-number">0<span>%</span></div>
+            <div class="stat-label">Data Collected</div>
+          </div>
+          <div>
+            <div class="stat-number">100<span>%</span></div>
+            <div class="stat-label">Client-Side Execution</div>
+          </div>
+          <div>
+            <div class="stat-number">&lt;1<span>ms</span></div>
+            <div class="stat-label">DOM Render Overhead</div>
+          </div>
+          <div>
+            <div class="stat-number">0<span>$</span></div>
+            <div class="stat-label">Free &amp; Open Source</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The Problem (Agitation) Section -->
+    <section id="problem" class="problem-section" aria-labelledby="problem-heading">
+      <div class="container">
+        
+        <div class="section-header">
+          <p class="section-eyebrow">The Cost of Unregulated Algorithms</p>
+          <h2 id="problem-heading" class="section-title">YouTube Isn't Broken.<br />It's Engineered to Steal Your Time.</h2>
+          <p class="section-subtitle">
+            You opened a tab to study an algorithm or learn a framework. Two hours later, you're trapped in viral shorts and clickbait thumbnails.
+          </p>
+        </div>
+
+        <div class="problem-grid">
+          <article class="problem-card">
+            <span class="problem-icon">🧠</span>
+            <h3 class="problem-title">The ADHD Dopamine Loop</h3>
+            <p class="problem-desc">
+              Infinite scroll grids and autoplays hijack attention spans, triggering cognitive context switching that destroys deep work sessions.
+            </p>
+          </article>
+
+          <article class="problem-card">
+            <span class="problem-icon">⏳</span>
+            <h3 class="problem-title">The 3-Second Shorts Trap</h3>
+            <p class="problem-desc">
+              Shorts are algorithmically tuned micro-stimulations designed to bypass intentional willpower. One accidental click drains 45 minutes of productive focus.
+            </p>
+          </article>
+
+          <article class="problem-card">
+            <span class="problem-icon">📉</span>
+            <h3 class="problem-title">Sidebar Rabbit Holes</h3>
+            <p class="problem-desc">
+              Watch page recommendations prey on peripheral vision, continuously pulling your gaze away from the tutorial or lecture you came to watch.
+            </p>
+          </article>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- The Solution (Feature Grid) -->
+    <section id="features" class="features-section" aria-labelledby="features-heading">
+      <div class="container">
+        
+        <div class="section-header">
+          <p class="section-eyebrow">Intentional Architecture</p>
+          <h2 id="features-heading" class="section-title">Built for Builders, Thinkers &amp; Students</h2>
+          <p class="section-subtitle">
+            TubeIntent strips YouTube of addictive surveillance mechanics, transforming it into an intentional reference library.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          
+          <div class="feature-card">
+            <span class="feature-badge">Focus</span>
+            <h3 class="feature-title">Zen Homepage</h3>
+            <p class="feature-desc">
+              Completely wipes the addictive recommendation grid on the homepage. Injects a distraction-free, centered search bar and direct playlist shortcuts.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <span class="feature-badge">Discipline</span>
+            <h3 class="feature-title">Total Shorts Eradication</h3>
+            <p class="feature-desc">
+              Purges Shorts carousels from search results, removes sidebar guide shortcuts, and automatically redirects direct <code>/shorts/</code> URLs to the standard desktop player.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <span class="feature-badge">Deep Work</span>
+            <h3 class="feature-title">Hide Related Recommendations</h3>
+            <p class="feature-desc">
+              Hides the "Up Next" sidebar completely. Automatically expands and centers the main video player for maximum viewing immersion without peripheral noise.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <span class="feature-badge">Clarity</span>
+            <h3 class="feature-title">Hide Comment Rabbit Holes</h3>
+            <p class="feature-desc">
+              Erases discussion sections under watch pages. Prevent doomscrolling flame wars and stay immersed in your primary task.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <span class="feature-badge">Control</span>
+            <h3 class="feature-title">Instant Master Pause</h3>
+            <p class="feature-desc">
+              Need to unwind on Friday night? Toggle master pause in the popup to instantly suspend all filters and restore full, normal YouTube without refreshing.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <span class="feature-badge">Security</span>
+            <h3 class="feature-title">100% Client-Side Privacy</h3>
+            <p class="feature-desc">
+              Zero telemetry. Zero analytics scripts. Strict Trusted Types compliance with minimum Manifest V3 permissions. Your data never touches a remote server.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Trust & Open Source Statement -->
+    <section id="privacy" class="trust-section" aria-labelledby="trust-heading">
+      <div class="container">
+        <div class="trust-banner">
+          <h2 id="trust-heading" class="trust-title">Zero Tracking. 100% Open Source.</h2>
+          <p class="trust-desc">
+            We believe productivity tools should respect your cognition and your privacy. TubeIntent runs exclusively inside your browser sandbox with zero network transmission.
+          </p>
+
+          <div class="trust-pillars">
+            <div class="pillar-item">
+              <span>🛡️</span>
+              <span>No Telemetry or User Profiling</span>
+            </div>
+            <div class="pillar-item">
+              <span>⚡</span>
+              <span>Zero Dependency Vanilla JS</span>
+            </div>
+            <div class="pillar-item">
+              <span>📜</span>
+              <span>MIT Licensed Public Code</span>
+            </div>
+            <div class="pillar-item">
+              <span>🔒</span>
+              <span>Strict Manifest V3 Sandboxed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq-section" aria-labelledby="faq-heading">
+      <div class="container">
+        
+        <div class="section-header">
+          <p class="section-eyebrow">Frequently Asked Questions</p>
+          <h2 id="faq-heading" class="section-title">Everything You Need to Know</h2>
+          <p class="section-subtitle">
+            Transparent answers on permissions, performance, and functionality.
+          </p>
+        </div>
+
+        <div class="faq-list">
+          
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>Is TubeIntent completely free?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>Yes, 100% free and open-source under the MIT license. There are no paid tiers, subscriptions, paywalls, or hidden telemetry.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>Why does the extension require permissions on YouTube?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>TubeIntent strictly requests permissions for <code>youtube.com</code> and local <code>storage</code>. It needs access solely to hide distracting elements via declarative CSS and inspect URLs to redirect Shorts into standard desktop videos. It cannot read your passwords, emails, or activity on any other site.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>Will this slow down my browser or video playback?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>Not at all. In fact, it often speeds up YouTube. By preventing the infinite feed and heavy recommendation carousels from rendering, TubeIntent significantly reduces DOM memory usage and CPU rendering overhead.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>What happens if I click a link to a YouTube Short?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>TubeIntent intercepts the navigation and instantly converts the URL into a normal desktop watch page (<code>/watch?v=...</code>). You get standard video controls, volume sliders, and scrubber bars without the addictive vertical doomscroll feed.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>Can I temporarily disable it when I want to relax?</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>Yes! Simply click the TubeIntent icon in your toolbar and toggle <strong>Pause Extension</strong>. It immediately bypasses all filters and restores full, unadulterated YouTube without needing to reload your tab.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Bottom Conversion CTA -->
+    <section class="cta-banner" aria-labelledby="cta-banner-heading">
+      <div class="container">
+        <div class="cta-banner-card">
+          <h2 id="cta-banner-heading" class="cta-heading">Stop Doomscrolling. Start Building.</h2>
+          <p class="cta-subtext">
+            Join thousands of developers, researchers, and students who have taken back their cognitive attention.
+          </p>
+          <a href="https://microsoftedge.microsoft.com/addons" class="btn-primary" target="_blank" rel="noopener noreferrer">
+            <span>Add to Microsoft Edge – It’s Free</span>
+            <span>→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Semantic Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="icons/icon32.png" alt="TubeIntent Logo" width="20" height="20" />
+        <span>&copy; 2026 TubeIntent. Open source under the MIT License.</span>
+      </div>
+
+      <ul class="footer-links">
+        <li><a href="https://github.com/TubeIntent/TubeIntent" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+        <li><a href="#privacy">Privacy Policy</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="mailto:support@tubeintent.app">Contact</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Vanilla JavaScript Accordion Controller -->
+  <script>
+    (function () {
+      "use strict";
+
+      const faqItems = document.querySelectorAll(".faq-item");
+
+      faqItems.forEach((item) => {
+        const button = item.querySelector(".faq-question");
+
+        button.addEventListener("click", () => {
+          const isActive = item.classList.contains("active");
+
+          // Close all open accordions
+          faqItems.forEach((other) => {
+            other.classList.remove("active");
+            const otherBtn = other.querySelector(".faq-question");
+            if (otherBtn) otherBtn.setAttribute("aria-expanded", "false");
+          });
+
+          // Toggle clicked item
+          if (!isActive) {
+            item.classList.add("active");
+            button.setAttribute("aria-expanded", "true");
+          } else {
+            button.setAttribute("aria-expanded", "false");
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
